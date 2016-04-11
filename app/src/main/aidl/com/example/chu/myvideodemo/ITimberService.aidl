@@ -1,6 +1,6 @@
-package com.naman14.timber;
+package com.example.chu.myvideodemo;
 
-import com.naman14.timber.helpers.MusicPlaybackTrack;
+import com.example.chu.myvideodemo.helpers.MusicPlaybackTrack;
 
 interface ITimberService
 {

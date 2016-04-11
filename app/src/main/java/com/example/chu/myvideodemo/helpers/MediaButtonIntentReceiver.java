@@ -22,9 +22,9 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 import android.view.KeyEvent;
 
-import com.naman14.timber.MusicService;
-import com.naman14.timber.activities.MainActivity;
-import com.naman14.timber.utils.PreferencesUtility;
+import com.example.chu.myvideodemo.MainActivity;
+import com.example.chu.myvideodemo.MusicService;
+import com.example.chu.myvideodemo.PreferencesUtility;
 
 /**
  * Used to control headset playback.

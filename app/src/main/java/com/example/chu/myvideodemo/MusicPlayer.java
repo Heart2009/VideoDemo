@@ -17,7 +17,6 @@ package com.example.chu.myvideodemo;
 
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -28,12 +27,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.provider.BaseColumns;
 import android.provider.MediaStore;
-import android.widget.Toast;
 
 import com.example.chu.myvideodemo.helpers.MusicPlaybackTrack;
-import com.naman14.timber.ITimberService;
 
 import java.util.Arrays;
 import java.util.WeakHashMap;
@@ -447,20 +443,6 @@ public class MusicPlayer {
         }
     }
 
-//    public static void playArtist(final Context context, final long artistId, int position, boolean shuffle) {
-//        final long[] artistList = getSongListForArtist(context, artistId);
-//        if (artistList != null) {
-//            playAll(context, artistList, position, artistId, TimberUtils.IdType.Artist, shuffle);
-//        }
-//    }
-//
-//    public static void playAlbum(final Context context, final long albumId, int position, boolean shuffle) {
-//        final long[] albumList = getSongListForAlbum(context, albumId);
-//        if (albumList != null) {
-//            playAll(context, albumList, position, albumId, TimberUtils.IdType.Album, shuffle);
-//        }
-//    }
-
     public static void playAll(final Context context, final long[] list, int position,
                                final long sourceId, final TimberUtils.IdType sourceType,
                                final boolean forceShuffle) {
@@ -490,54 +472,6 @@ public class MusicPlayer {
             e.printStackTrace();
         }
     }
-
-//    public static void playNext(Context context, final long[] list, final long sourceId, final TimberUtils.IdType sourceType) {
-//        if (mService == null) {
-//            return;
-//        }
-//        try {
-//            mService.enqueue(list, MusicService.NEXT, sourceId, sourceType.mId);
-//            final String message = makeLabel(context, R.plurals.NNNtrackstoqueue, list.length);
-//            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-//        } catch (final RemoteException ignored) {
-//        }
-//    }
-
-//    public static final long[] getSongListForArtist(final Context context, final long id) {
-//        final String[] projection = new String[]{
-//                BaseColumns._ID
-//        };
-//        final String selection = MediaStore.Audio.AudioColumns.ARTIST_ID + "=" + id + " AND "
-//                + MediaStore.Audio.AudioColumns.IS_MUSIC + "=1";
-//        Cursor cursor = context.getContentResolver().query(
-//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null,
-//                MediaStore.Audio.AudioColumns.ALBUM_KEY + "," + MediaStore.Audio.AudioColumns.TRACK);
-//        if (cursor != null) {
-//            final long[] mList =null;//= SongLoader.getSongListForCursor(cursor);
-//            cursor.close();
-//            cursor = null;
-//            return mList;
-//        }
-//        return sEmptyList;
-//    }
-//
-//    public static final long[] getSongListForAlbum(final Context context, final long id) {
-//        final String[] projection = new String[]{
-//                BaseColumns._ID
-//        };
-//        final String selection = MediaStore.Audio.AudioColumns.ALBUM_ID + "=" + id + " AND " + MediaStore.Audio.AudioColumns.IS_MUSIC
-//                + "=1";
-//        Cursor cursor = context.getContentResolver().query(
-//                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null,
-//                MediaStore.Audio.AudioColumns.TRACK + ", " + MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
-//        if (cursor != null) {
-//            final long[] mList =null;//= SongLoader.getSongListForCursor(cursor);
-//            cursor.close();
-//            cursor = null;
-//            return mList;
-//        }
-//        return sEmptyList;
-//    }
 
     public static final int getSongCountForAlbumInt(final Context context, final long id) {
         int songCount = 0;
@@ -632,57 +566,11 @@ public class MusicPlayer {
         } catch (final RemoteException ignored) {
         }
     }
-//
-//    public static void addToQueue(final Context context, final long[] list, long sourceId,
-//                                  TimberUtils.IdType sourceType) {
-//        if (mService == null) {
-//            return;
-//        }
-//        try {
-//            mService.enqueue(list, MusicService.LAST, sourceId, sourceType.mId);
-//            final String message = makeLabel(context, R.plurals.NNNtrackstoqueue, list.length);
-//            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-//        } catch (final RemoteException ignored) {
-//        }
-//    }
 
     public static final String makeLabel(final Context context, final int pluralInt,
                                          final int number) {
         return context.getResources().getQuantityString(pluralInt, number, number);
     }
-
-//    public static void addToPlaylist(final Context context, final long[] ids, final long playlistid) {
-//        final int size = ids.length;
-//        final ContentResolver resolver = context.getContentResolver();
-//        final String[] projection = new String[]{
-//                "max(" + "play_order" + ")",
-//        };
-//        final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistid);
-//        Cursor cursor = null;
-//        int base = 0;
-//
-//        try {
-//            cursor = resolver.query(uri, projection, null, null, null);
-//
-//            if (cursor != null && cursor.moveToFirst()) {
-//                base = cursor.getInt(0) + 1;
-//            }
-//        } finally {
-//            if (cursor != null) {
-//                cursor.close();
-//                cursor = null;
-//            }
-//        }
-//
-//        int numinserted = 0;
-//        for (int offSet = 0; offSet < size; offSet += 1000) {
-//            makeInsertItems(ids, offSet, 1000, base);
-//            numinserted += resolver.bulkInsert(uri, mContentValuesCache);
-//        }
-//        final String message = context.getResources().getQuantityString(
-//                R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
-//        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-//    }
 
     public static void makeInsertItems(final long[] ids, final int offset, int len, final int base) {
         if (offset + len > ids.length) {
@@ -699,31 +587,6 @@ public class MusicPlayer {
             mContentValuesCache[i].put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, base + offset + i);
             mContentValuesCache[i].put(MediaStore.Audio.Playlists.Members.AUDIO_ID, ids[offset + i]);
         }
-    }
-
-    public static final long createPlaylist(final Context context, final String name) {
-        if (name != null && name.length() > 0) {
-            final ContentResolver resolver = context.getContentResolver();
-            final String[] projection = new String[]{
-                    MediaStore.Audio.PlaylistsColumns.NAME
-            };
-            final String selection = MediaStore.Audio.PlaylistsColumns.NAME + " = '" + name + "'";
-            Cursor cursor = resolver.query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                    projection, selection, null, null);
-            if (cursor.getCount() <= 0) {
-                final ContentValues values = new ContentValues(1);
-                values.put(MediaStore.Audio.PlaylistsColumns.NAME, name);
-                final Uri uri = resolver.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                        values);
-                return Long.parseLong(uri.getLastPathSegment());
-            }
-            if (cursor != null) {
-                cursor.close();
-                cursor = null;
-            }
-            return -1;
-        }
-        return -1;
     }
 
     public static final class ServiceBinder implements ServiceConnection {

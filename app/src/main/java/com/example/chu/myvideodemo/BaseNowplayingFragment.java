@@ -17,29 +17,18 @@ package com.example.chu.myvideodemo;
 import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.chu.myvideodemo.timely.TimelyView;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 import net.steamcrafted.materialiconlib.MaterialIconView;
@@ -216,13 +205,6 @@ public class BaseNowplayingFragment extends Fragment implements MusicStateListen
         mProgress = (SeekBar) view.findViewById(R.id.song_progress);
         mCircularProgress = (CircularSeekBar) view.findViewById(R.id.song_progress_circular);
 
-        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            final ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
-            ab.setDisplayHomeAsUpEnabled(true);
-            ab.setTitle("");
-        }
         if (mPlayPause != null && getActivity() != null) {
             mPlayPause.setColor(ContextCompat.getColor(getContext(), android.R.color.white));
         }
@@ -431,23 +413,23 @@ public class BaseNowplayingFragment extends Fragment implements MusicStateListen
         //do not reload image if it was a play/pause change
         if (!duetoplaypause) {
             if (albumart != null) {
-                ImageLoader.getInstance().displayImage(TimberUtils.getAlbumArtUri(MusicPlayer.getCurrentAlbumId()).toString(), albumart,
-                        new DisplayImageOptions.Builder().cacheInMemory(true)
-                                //.showImageOnFail(R.drawable.ic_empty_music2)
-                                .build(), new SimpleImageLoadingListener() {
-
-                            @Override
-                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                                doAlbumArtStuff(loadedImage);
-                            }
-
-                            @Override
-                            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                                //                                Bitmap failedBitmap = ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_empty_music2);
-                                //                                doAlbumArtStuff(failedBitmap);
-                            }
-
-                        });
+//                ImageLoader.getInstance().displayImage(TimberUtils.getAlbumArtUri(MusicPlayer.getCurrentAlbumId()).toString(), albumart,
+//                        new DisplayImageOptions.Builder().cacheInMemory(true)
+//                                //.showImageOnFail(R.drawable.ic_empty_music2)
+//                                .build(), new SimpleImageLoadingListener() {
+//
+//                            @Override
+//                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+//                                doAlbumArtStuff(loadedImage);
+//                            }
+//
+//                            @Override
+//                            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+//                                //                                Bitmap failedBitmap = ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_empty_music2);
+//                                //                                doAlbumArtStuff(failedBitmap);
+//                            }
+//
+//                        });
             }
         }
         duetoplaypause = false;
@@ -492,14 +474,6 @@ public class BaseNowplayingFragment extends Fragment implements MusicStateListen
         }
     }
 
-    public void setQueueSongs() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //load queue songs in asynctask
-        //if (getActivity() != null)
-        //new loadQueueSongs().execute("");
-
-    }
-
     public void updatePlayPauseButton() {
         if (MusicPlayer.isPlaying()) {
             if (!mPlayPause.isPlayed()) {
@@ -537,13 +511,6 @@ public class BaseNowplayingFragment extends Fragment implements MusicStateListen
 
     public void onMetaChanged() {
         updateSongDetails();
-
-        if (recyclerView != null && recyclerView.getAdapter() != null)
-            recyclerView.getAdapter().notifyDataSetChanged();
-    }
-
-    public void setMusicStateListener() {
-        ((BaseActivity) getActivity()).setMusicStateListenerListener(this);
     }
 
     public void doAlbumArtStuff(Bitmap loadedImage) {

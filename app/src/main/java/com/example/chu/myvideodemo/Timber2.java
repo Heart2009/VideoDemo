@@ -27,19 +27,16 @@ import android.widget.ImageView;
 
 import net.steamcrafted.materialiconlib.MaterialDrawableBuilder;
 
-
-public class Timber4 extends BaseNowplayingFragment {
+public class Timber2 extends BaseNowplayingFragment {
 
     ImageView mBlurredArt;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(
-                R.layout.fragment_timber4, container, false);
+                R.layout.fragment_timber2, container, false);
 
-        //setMusicStateListener();
         setSongDetails(rootView);
-
         mBlurredArt = (ImageView) rootView.findViewById(R.id.album_art_blurred);
 
         return rootView;
@@ -132,6 +129,4 @@ public class Timber4 extends BaseNowplayingFragment {
         protected void onPreExecute() {
         }
     }
-
-
 }

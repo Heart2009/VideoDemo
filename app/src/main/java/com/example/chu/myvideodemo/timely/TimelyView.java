@@ -18,20 +18,23 @@
 package com.example.chu.myvideodemo.timely;
 
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Property;
 import android.view.View;
 
-import com.naman14.timber.R;
-import com.naman14.timber.timely.animation.TimelyEvaluator;
-import com.naman14.timber.timely.model.NumberUtils;
+import com.example.chu.myvideodemo.R;
+import com.example.chu.myvideodemo.timely.animation.TimelyEvaluator;
+import com.example.chu.myvideodemo.timely.model.NumberUtils;
 
+@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class TimelyView extends View {
     private static final float RATIO = 1f;
     private static final Property<TimelyView, float[][]> CONTROL_POINTS_PROPERTY = new Property<TimelyView, float[][]>(float[][].class, "controlPoints") {

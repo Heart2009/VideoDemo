@@ -18,7 +18,6 @@ package com.example.chu.myvideodemo;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -32,14 +31,12 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -56,17 +53,15 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.NotificationCompat;
-import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.chu.myvideodemo.helpers.MediaButtonIntentReceiver;
 import com.example.chu.myvideodemo.helpers.MusicPlaybackTrack;
+import com.example.chu.myvideodemo.permissions.Nammu;
 import com.example.chu.myvideodemo.provider.MusicPlaybackState;
 import com.example.chu.myvideodemo.provider.RecentStore;
 import com.example.chu.myvideodemo.provider.SongPlayCount;
-import com.naman14.timber.ITimberService;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.IOException;
@@ -468,10 +463,10 @@ public class MusicService extends Service {
 
         if (D) Log.d(TAG, "handleCommandIntent: action = " + action + ", command = " + command);
 
-        if (NotificationHelper.checkIntent(intent)) {
-            goToPosition(mPlayPos + NotificationHelper.getPosition(intent));
-            return;
-        }
+//        if (NotificationHelper.checkIntent(intent)) {
+//            goToPosition(mPlayPos + NotificationHelper.getPosition(intent));
+//            return;
+//        }
 
         if (CMDNEXT.equals(command) || NEXT_ACTION.equals(action)) {
             gotoNext(true);
@@ -500,38 +495,6 @@ public class MusicService extends Service {
         } else if (SHUFFLE_ACTION.equals(action)) {
             cycleShuffle();
         }
-    }
-
-    private void updateNotification() {
-        final int newNotifyMode;
-        if (isPlaying()) {
-            newNotifyMode = NOTIFY_MODE_FOREGROUND;
-        } else if (recentlyPlayed()) {
-            newNotifyMode = NOTIFY_MODE_BACKGROUND;
-        } else {
-            newNotifyMode = NOTIFY_MODE_NONE;
-        }
-
-        int notificationId = hashCode();
-        if (mNotifyMode != newNotifyMode) {
-            if (mNotifyMode == NOTIFY_MODE_FOREGROUND) {
-                if (TimberUtils.isLollipop())
-                    stopForeground(newNotifyMode == NOTIFY_MODE_NONE);
-                else
-                    stopForeground(newNotifyMode == NOTIFY_MODE_NONE || newNotifyMode == NOTIFY_MODE_BACKGROUND);
-            } else if (newNotifyMode == NOTIFY_MODE_NONE) {
-                mNotificationManager.cancel(notificationId);
-                mNotificationPostTime = 0;
-            }
-        }
-
-        if (newNotifyMode == NOTIFY_MODE_FOREGROUND) {
-            startForeground(notificationId, buildNotification());
-        } else if (newNotifyMode == NOTIFY_MODE_BACKGROUND) {
-            mNotificationManager.notify(notificationId, buildNotification());
-        }
-
-        mNotifyMode = newNotifyMode;
     }
 
     private void cancelNotification() {
@@ -1049,10 +1012,6 @@ public class MusicService extends Service {
             saveQueue(false);
         }
 
-        if (what.equals(PLAYSTATE_CHANGED)) {
-            updateNotification();
-        }
-
     }
 
     private void updateMediaSession(final String what) {
@@ -1097,98 +1056,6 @@ public class MusicService extends Service {
                         .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE |
                                 PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
                         .build());
-            }
-        }
-    }
-
-    private Notification buildNotification() {
-        final String albumName = getAlbumName();
-        final String artistName = getArtistName();
-        final boolean isPlaying = isPlaying();
-        String text = TextUtils.isEmpty(albumName)
-                ? artistName : artistName + " - " + albumName;
-
-        int playButtonResId = isPlaying
-                ? R.drawable.ic_pause_white_36dp : R.drawable.ic_play_white_36dp;
-
-        Intent nowPlayingIntent = NavigationUtils.getNowPlayingIntent(this);
-        PendingIntent clickIntent = PendingIntent.getActivity(this, 0, nowPlayingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Bitmap artwork;
-        artwork = ImageLoader.getInstance().loadImageSync(TimberUtils.getAlbumArtUri(getAlbumId()).toString());
-
-        if (artwork == null) {
-            artwork = ImageLoader.getInstance().loadImageSync("drawable://" + R.drawable.ic_empty_music2);
-        }
-
-        if (mNotificationPostTime == 0) {
-            mNotificationPostTime = System.currentTimeMillis();
-        }
-
-        android.support.v4.app.NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_notification)
-                .setLargeIcon(artwork)
-                .setContentIntent(clickIntent)
-                .setContentTitle(getTrackName())
-                .setContentText(text)
-                .setWhen(mNotificationPostTime)
-                .addAction(R.drawable.ic_skip_previous_white_36dp,
-                        "",
-                        retrievePlaybackAction(PREVIOUS_ACTION))
-                .addAction(playButtonResId, "",
-                        retrievePlaybackAction(TOGGLEPAUSE_ACTION))
-                .addAction(R.drawable.ic_skip_next_white_36dp,
-                        "",
-                        retrievePlaybackAction(NEXT_ACTION));
-
-        if (TimberUtils.isJellyBeanMR1()) {
-            builder.setShowWhen(false);
-        }
-        if (TimberUtils.isLollipop()) {
-            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-            NotificationCompat.MediaStyle style = new NotificationCompat.MediaStyle()
-                    .setMediaSession(mSession.getSessionToken())
-                    .setShowActionsInCompactView(0, 1, 2, 3);
-            builder.setStyle(style);
-        }
-        if (artwork != null && TimberUtils.isLollipop())
-            builder.setColor(Palette.from(artwork).generate().getVibrantColor(Color.parseColor("#403f4d")));
-        Notification n = builder.build();
-
-        if (PreferencesUtility.getInstance(this).getXPosedTrackselectorEnabled()) {
-            addXTrackSelector(n);
-        }
-
-        return n;
-    }
-
-    private void addXTrackSelector(Notification n) {
-        if (NotificationHelper.isSupported(n)) {
-            StringBuilder selection = new StringBuilder();
-            StringBuilder order = new StringBuilder().append("CASE _id \n");
-            for (int i = 0; i < mPlaylist.size(); i++) {
-                selection.append("_id=").append(mPlaylist.get(i).mId).append(" OR ");
-                order.append("WHEN ").append(mPlaylist.get(i).mId).append(" THEN ").append(i).append("\n");
-            }
-            order.append("END");
-            Cursor c = getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, NOTIFICATION_PROJECTION, selection.substring(0, selection.length() - 3), null, order.toString());
-            if (c != null && c.getCount() != 0) {
-                c.moveToFirst();
-                ArrayList<Bundle> list = new ArrayList<>();
-                do {
-                    TrackItem t = new TrackItem()
-                            .setArt(ImageLoader.getInstance()
-                                    .loadImageSync(TimberUtils.getAlbumArtUri(c.getLong(c.getColumnIndexOrThrow(AudioColumns.ALBUM_ID))).toString()))
-                            .setTitle(c.getString(c.getColumnIndexOrThrow(AudioColumns.TITLE)))
-                            .setArtist(c.getString(c.getColumnIndexOrThrow(AudioColumns.ARTIST)))
-                            .setDuration(TimberUtils.makeShortTimeString(this, c.getInt(c.getColumnIndexOrThrow(AudioColumns.DURATION)) / 1000));
-                    list.add(t.get());
-                } while (c.moveToNext());
-                try {
-                    NotificationHelper.insertToNotification(n, list, this, getQueuePosition());
-                } catch (ModNotInstalledException e) {
-                    e.printStackTrace();
-                }
-                c.close();
             }
         }
     }
@@ -1856,7 +1723,7 @@ public class MusicService extends Service {
             setIsSupposedToBePlaying(true, true);
 
             cancelShutdown();
-            updateNotification();
+            //updateNotification();
             notifyChange(META_CHANGED);
         } else if (mPlaylist.size() <= 0) {
             setShuffleMode(SHUFFLE_AUTO);
@@ -2151,7 +2018,7 @@ public class MusicService extends Service {
                         }
                         service.updateCursor(service.mPlaylist.get(service.mPlayPos).mId);
                         service.notifyChange(META_CHANGED);
-                        service.updateNotification();
+                        //service.updateNotification();
                         break;
                     case TRACK_ENDED:
                         if (service.mRepeatMode == REPEAT_CURRENT) {
@@ -2453,7 +2320,7 @@ public class MusicService extends Service {
         @Override
         public void open(final long[] list, final int position, long sourceId, int sourceType)
                 throws RemoteException {
-            mService.get().open(list, position, sourceId, IdType.getTypeById(sourceType));
+            mService.get().open(list, position, sourceId, TimberUtils.IdType.getTypeById(sourceType));
         }
 
         @Override
@@ -2485,7 +2352,7 @@ public class MusicService extends Service {
         @Override
         public void enqueue(final long[] list, final int action, long sourceId, int sourceType)
                 throws RemoteException {
-            mService.get().enqueue(list, action, sourceId, IdType.getTypeById(sourceType));
+            mService.get().enqueue(list, action, sourceId, TimberUtils.IdType.getTypeById(sourceType));
         }
 
         @Override

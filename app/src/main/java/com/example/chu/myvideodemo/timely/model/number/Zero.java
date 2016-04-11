@@ -1,6 +1,6 @@
 package com.example.chu.myvideodemo.timely.model.number;
 
-import com.naman14.timber.timely.model.core.Figure;
+import com.example.chu.myvideodemo.timely.model.core.Figure;
 
 public class Zero extends Figure {
     private static final float[][] POINTS = {
