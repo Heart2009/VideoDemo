@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">GooglePlayLibrary</string>
+    <string name="casting_to_device">Casting to %1$s</string>
+    <string name="loading">Loading…</string>
+    <string name="background_image_str">Background image for album art</string>
+    <string name="play_pause">play or pause</string>
+    <string name="skip_next">skip to next</string>
+    <string name="skip_prev">skip to previous</string>
+    <string name="media_route_menu_title">Play on…</string>
+    <string name="touch_to_cast">Touch to connect to a Google Cast device</string>
+    <string name="browse_musics_by_genre_subtitle">%1$s songs</string>
+    <string name="search_queue_title">Search results</string>
+    <string name="random_queue_title">Random music</string>
+    <string name="error_no_metadata">Unable to retrieve metadata.</string>
+    <string name="favorite">Favorite</string>
+</resources>
